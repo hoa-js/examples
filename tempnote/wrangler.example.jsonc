@@ -1,0 +1,20 @@
+{
+  "account_id": "your-account-id", // Change to your Cloudflare Account ID
+  "name": "tempnote",
+  "main": "tempnote.js",
+  "compatibility_date": "2025-09-30",
+  "no_bundle": false,
+  "minify": true,
+  "routes": [
+    {
+      "pattern": "your-domain.com/*", // Change to your domain
+      "zone_name": "your-domain.com" // Change to your domain
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "your-kv-namespace-id" // Change to your KV Namespace ID
+    }
+  ]
+}

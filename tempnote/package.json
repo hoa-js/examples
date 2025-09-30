@@ -1,0 +1,30 @@
+{
+  "name": "tempnote",
+  "version": "1.0.0",
+  "description": "A temporary note website built with Hoa.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "author": "nswbmw",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoa-js/examples.git"
+  },
+  "devDependencies": {
+    "eslint": "9.36.0",
+    "neostandard": "0.12.2",
+    "wrangler": "~4.40.2"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@hoajs/router": "0.1.0",
+    "hoa": "0.1.0"
+  }
+}
