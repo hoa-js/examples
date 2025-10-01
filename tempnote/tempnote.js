@@ -4,21 +4,6 @@ import { router } from '@hoajs/router'
 const app = new Hoa()
 app.extend(router())
 
-async function createPassword (password) {
-  const SALT = 'demo'
-  const data = new TextEncoder().encode(password + SALT)
-  const hash = await crypto.subtle.digest('SHA-256', data)
-  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('')
-}
-
-async function getHashedPasswordByPath (ctx) {
-  const passwordKey = getPasswordKey(ctx)
-  return ctx.env.KV.get(passwordKey)
-}
-function getPasswordKey (ctx) {
-  return `pwd:${ctx.req.params.path}`
-}
-
 app.post('/:path/password', async (ctx, next) => {
   const passwordKey = getPasswordKey(ctx)
   const body = await ctx.req.json()
@@ -62,10 +47,10 @@ app.get('/:path', async (ctx, next) => {
   const lockModal = `
     <div class="${modalClass}" id="unlockModal">
       <div class="modal-content">
-        <h3>解锁</h3>
-        <input type="password" id="unlockPasswordInput" placeholder="请输入密码">
+        <h3>Unlock</h3>
+        <input type="password" id="unlockPasswordInput" placeholder="please enter password">
         <div class="modal-footer">
-          <button id="unlockButton">确认</button>
+          <button id="unlockButton">confirm</button>
         </div>
       </div>
     </div>
@@ -124,7 +109,7 @@ app.get('/:path', async (ctx, next) => {
         .menu {
           position: fixed;
           right: 20px;
-          bottom: 20%;
+          bottom: 20px;
           display: flex;
           flex-direction: column;
           align-items: flex-end;
@@ -243,20 +228,20 @@ app.get('/:path', async (ctx, next) => {
     <body>
       <textarea name="note" placeholder="Please input..." maxlength="65536" autofocus>${safeNote}</textarea>
       <div class="menu">
-        <button class="menu-toggle" id="menuToggle">☰</button>
         <div class="submenu" id="submenu">
-          <button class="btn" id="passwordSettingButton">设置密码</button>
-          <button class="btn" id="shareButton">分享</button>
+          <button class="btn" id="passwordSettingButton">Add Password</button>
+          <button class="btn" id="shareButton">Share</button>
         </div>
+        <button class="menu-toggle" id="menuToggle">☰</button>
       </div>
       ${lockModal}
       <div class="modal" id="passwordModal">
         <div class="modal-content">
-          <h3>设置密码</h3>
-          <input type="password" id="passwordInput" placeholder="请输入密码">
+          <h3>Add password to note</h3>
+          <input type="password" id="passwordInput" placeholder="please enter password">
           <div class="modal-footer">
-            <button id="savePasswordButton">保存</button>
-            <button onclick="closeModal(passwordModal)">取消</button>
+            <button id="savePasswordButton">save</button>
+            <button onclick="closeModal(passwordModal)">cancel</button>
           </div>
         </div>
       </div>
@@ -285,10 +270,11 @@ app.get('/:path', async (ctx, next) => {
         })
 
         let hasPassword = ${!!storedPassword}
-
-        const passwordModal = getDom('#passwordModal');
-        const passwordInput = getDom('#passwordInput');
-        const submenu = getDom('#submenu');
+        let notePassword = ''
+        let fromShare = false
+        const passwordModal = getDom('#passwordModal')
+        const passwordInput = getDom('#passwordInput')
+        const submenu = getDom('#submenu')
         const unlockModal = getDom('#unlockModal')
         const unlockPasswordInput = getDom('#unlockPasswordInput')
         const unlockPasswordButton = getDom('#unlockButton')
@@ -296,16 +282,18 @@ app.get('/:path', async (ctx, next) => {
         const savePasswordButton = getDom('#savePasswordButton')
         const menuToggle = getDom('#menuToggle')
         const shareButton = getDom('#shareButton')
+
         function openModal(dom) {
-          dom.style.display = 'flex';
+          dom.style.display = 'flex'
         }
+
         function closeModal(dom) {
-          dom.style.display = 'none';
+          dom.style.display = 'none'
         }
 
         unlockPasswordButton.addEventListener('click', () => {
-          if(!unlockPasswordInput.value) {
-            alert("密码不能为空")
+          if (!unlockPasswordInput.value) {
+            alert('password cannot be empty')
           }
           const url = window.location.origin + window.location.pathname + '/validate?password=' + unlockPasswordInput.value
           fetch(url, {
@@ -313,29 +301,32 @@ app.get('/:path', async (ctx, next) => {
             headers: {
               'Content-Type': 'application/json'
             },
-          }).then(async (resp) => {
-            const res = await resp.json()
-            if(res.status && res.password) {
+          })
+          .then(resp => resp.json())
+          .then(res => {
+            if (res.status && res.password) {
               const url = new URL(window.location.href)
               url.searchParams.delete('pwd')
               url.searchParams.append('pwd', res.password)
               window.location.href = url.href
             } else {
-              alert('密码不正确')
+              alert('password is no correct')
             }
           })
-        });
+        })
 
         passworSettingButton.addEventListener('click', () => {
-          if(hasPassword) {
-            return alert('已经设置过密码')
+          menuToggle.click()
+          fromShare = false
+          if (hasPassword) {
+            return alert('already set password')
           }
-          openModal(passwordModal);
-        });
+          openModal(passwordModal)
+        })
 
         savePasswordButton.addEventListener('click', () => {
-          if(!passwordInput.value) {
-            alert("密码不能为空")
+          if (!passwordInput.value) {
+            alert('password cannot be empty')
           }
           const url = window.location.href + '/password'
           fetch(url, {
@@ -344,47 +335,45 @@ app.get('/:path', async (ctx, next) => {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify(\{ password: passwordInput.value \})
-          }).then(() => {
-            hasPassword = true
-            closeModal(passwordModal);
-            alert("密码设置成功");
           })
-        });
+          .then(resp => resp.json())
+          .then(res => {
+            hasPassword = true
+            notePassword = res.password
+            closeModal(passwordModal)
+            if (fromShare) {
+              copyToClipboard(notePassword)
+            }
+          })
+        })
 
         menuToggle.addEventListener('click', () => {
-          submenu.classList.toggle('show');
-        });
+          submenu.classList.toggle('show')
+        })
 
         shareButton.addEventListener('click', () => {
-          if(!hasPassword){
-            if(confirm("是否需要设置密码？")){
-              openModal(passwordModal);
-              document.getElementById('savePassword').onclick = () => {
-                savedPassword = passwordInput.value;
-                if(savedPassword){
-                  hasPassword = true;
-                  alert("密码设置成功");
-                  closeModal(passwordModal);
-                  if(confirm("是否继续分享？")){
-                    copyToClipboard(window.location.href + "?pwd=" + savedPassword);
-                  }
-                }
-              }
+          menuToggle.click()
+          if (!hasPassword) {
+            if (confirm('set password to note?')) {
+              fromShare = true
+              openModal(passwordModal)
             } else {
-              copyToClipboard(window.location.href);
+              copyToClipboard()
             }
           } else {
-            if(!window.location.href.includes("pwd=")){
-              copyToClipboard(window.location.href + "?pwd=" + savedPassword);
-            } else {
-              copyToClipboard(window.location.href);
-            }
+            copyToClipboard(notePassword)
           }
-        });
-        function copyToClipboard(text){
-          navigator.clipboard.writeText(text).then(() => {
-            alert("链接已复制至剪切板, 去分享");
-          });
+        })
+
+        function copyToClipboard(password) {
+          const shareLink = new URL(window.location.href)
+          if (password) {
+            shareLink.searchParams.keys().forEach((key) => shareLink.searchParams.delete(key))
+            shareLink.searchParams.append('pwd', password)
+          }
+          navigator.clipboard.writeText(shareLink.href).then(() => {
+            alert('share link is already paste to clipboard')
+          })
         }
       </script>
     </body>
@@ -411,8 +400,10 @@ app.use(async (ctx, next) => {
   ctx.res.redirect(randomPath())
 })
 
+export default app
+
 function parseCookie (ctx) {
-  const cookieStr = ctx.request.headers.get('cookie')
+  const cookieStr = ctx.req.get('cookie') || ''
   return cookieStr.split(';').reduce((acc, pair) => {
     const [key, ...rest] = pair.trim().split('=')
     if (!key) return acc
@@ -420,10 +411,26 @@ function parseCookie (ctx) {
     return acc
   }, {})
 }
+
 function isValidPath (path) {
   return /^[a-zA-Z0-9]{6}$/.test(path)
 }
-export default app
+
+async function createPassword (password) {
+  const SALT = 'demo'
+  const data = new TextEncoder().encode(password + SALT)
+  const hash = await crypto.subtle.digest('SHA-256', data)
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+async function getHashedPasswordByPath (ctx) {
+  const passwordKey = getPasswordKey(ctx)
+  return ctx.env.KV.get(passwordKey)
+}
+
+function getPasswordKey (ctx) {
+  return `pwd:${ctx.req.params.path}`
+}
 
 function randomPath (len = 6) {
   const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
