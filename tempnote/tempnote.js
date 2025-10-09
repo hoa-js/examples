@@ -1,49 +1,54 @@
 import { Hoa } from 'hoa'
 import { router } from '@hoajs/router'
-
+import { cookie } from '@hoajs/cookie'
 const app = new Hoa()
 app.extend(router())
+app.extend(cookie())
 
 app.post('/:path/password', async (ctx, next) => {
   const passwordKey = getPasswordKey(ctx)
-  const body = await ctx.req.json()
-  const hashedPassword = await createPassword(body.password)
-  await ctx.env.KV.put(passwordKey, hashedPassword, {
-    expirationTtl: 86400 * 365
+  const { password } = await ctx.req.json()
+  await ctx.env.KV.put(passwordKey, password, {
+    expirationTtl: 86400 * 365,
   })
   ctx.res.status = 200
   ctx.res.body = {
-    password: hashedPassword
+    password,
   }
 })
 
 app.get('/:path/validate', async (ctx, next) => {
-  const storedPassword = await getHashedPasswordByPath(ctx)
-  const hashedPassword = await createPassword(ctx.req.url.searchParams.get('password'))
+  const storedPassword = await getPassword(ctx)
   ctx.res.status = 200
-  const res = { status: hashedPassword === storedPassword }
-  if (res.status) {
-    res['password'] = storedPassword
+  const data = {
+    status: ctx.req.url.searchParams.get('password') === storedPassword,
   }
-  ctx.res.body = res
+  if (data.status) {
+    data['password'] = storedPassword
+  }
+  ctx.res.body = data
 })
 
 app.get('/:path', async (ctx, next) => {
   const path = ctx.req.params.path
+  if (!isValidPath(path)) {
+    return await next()
+  }
   const pwd = ctx.req.url.searchParams.get('pwd')
-  const storedPassword = await getHashedPasswordByPath(ctx)
+  const storedPassword = await getPassword(ctx)
   let note = ''
   if (!storedPassword || (storedPassword && storedPassword === pwd)) {
-    note = await ctx.env.KV.get(path) || ''
+    note = (await ctx.env.KV.get(path)) || ''
   }
   const safeNote = note.replace(/<\/textarea>/gi, '<\\/textarea>')
 
   ctx.res.set({
     'Cache-Control': 'no-store, no-cache, must-revalidate',
     Pragma: 'no-cache',
-    Expires: '0'
+    Expires: '0',
   })
-  const modalClass = 'modal' + (storedPassword && storedPassword !== pwd ? ' show' : '')
+  const modalClass =
+    'modal' + (storedPassword && storedPassword !== pwd ? ' show' : '')
   const lockModal = `
     <div class="${modalClass}" id="unlockModal">
       <div class="modal-content">
@@ -383,18 +388,18 @@ app.get('/:path', async (ctx, next) => {
 
 app.post('/:path', async (ctx, next) => {
   const path = ctx.req.params.path
-  const text = (await ctx.req.text() || '').trim().slice(0, 65536)
+  const text = ((await ctx.req.text()) || '').trim().slice(0, 65536)
   await ctx.env.KV.put(path, text, {
-    expirationTtl: 86400 * 365
+    expirationTtl: 86400 * 365,
   })
-  ctx.res.append('Set-Cookie', `last_path=${path}`)
+  ctx.res.setCookie('last_path', path)
   ctx.res.status = 200
 })
 
 app.use(async (ctx, next) => {
-  const cookie = parseCookie(ctx)
-  if (cookie.last_path && isValidPath(cookie.last_path)) {
-    ctx.res.redirect(cookie.last_path)
+  const last_path = ctx.req.getCookie('last_path')
+  if (isValidPath(last_path)) {
+    ctx.res.redirect(last_path)
     return
   }
   ctx.res.redirect(randomPath())
@@ -402,28 +407,11 @@ app.use(async (ctx, next) => {
 
 export default app
 
-function parseCookie (ctx) {
-  const cookieStr = ctx.req.get('cookie') || ''
-  return cookieStr.split(';').reduce((acc, pair) => {
-    const [key, ...rest] = pair.trim().split('=')
-    if (!key) return acc
-    acc[key] = decodeURIComponent(rest.join('='))
-    return acc
-  }, {})
-}
-
 function isValidPath (path) {
   return /^[a-zA-Z0-9]{6}$/.test(path)
 }
 
-async function createPassword (password) {
-  const SALT = 'demo'
-  const data = new TextEncoder().encode(password + SALT)
-  const hash = await crypto.subtle.digest('SHA-256', data)
-  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('')
-}
-
-async function getHashedPasswordByPath (ctx) {
+async function getPassword (ctx) {
   const passwordKey = getPasswordKey(ctx)
   return ctx.env.KV.get(passwordKey)
 }
@@ -433,7 +421,8 @@ function getPasswordKey (ctx) {
 }
 
 function randomPath (len = 6) {
-  const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const chars =
+    '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
   let result = ''
   for (let i = 0; i < len; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length))
