@@ -1,8 +1,8 @@
 import { Hoa } from 'hoa'
-import { router } from '@hoajs/router'
+import { tinyRouter } from '@hoajs/tiny-router'
 import { cookie } from '@hoajs/cookie'
 const app = new Hoa()
-app.extend(router())
+app.extend(tinyRouter())
 app.extend(cookie())
 
 app.post('/:path/password', async (ctx, next) => {

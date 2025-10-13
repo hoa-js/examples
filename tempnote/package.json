@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@hoajs/cookie": "0.1.0",
-    "@hoajs/router": "0.2.0",
+    "@hoajs/tiny-router": "0.1.0",
     "hoa": "0.2.0"
   }
 }
