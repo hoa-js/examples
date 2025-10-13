@@ -17,11 +17,11 @@ app.post('/:path/password', async (ctx, next) => {
   }
 })
 
-app.get('/:path/validate', async (ctx, next) => {
+app.get('/:path/verify', async (ctx, next) => {
   const storedPassword = await getPassword(ctx)
   ctx.res.status = 200
   const data = {
-    status: ctx.req.url.searchParams.get('password') === storedPassword,
+    status: ctx.req.query.pwd === storedPassword,
   }
   if (data.status) {
     data['password'] = storedPassword
@@ -32,9 +32,11 @@ app.get('/:path/validate', async (ctx, next) => {
 app.get('/:path', async (ctx, next) => {
   const path = ctx.req.params.path
   if (!isValidPath(path)) {
-    return await next()
+    ctx.res.body = ''
+    ctx.res.status = 204
+    return
   }
-  const pwd = ctx.req.url.searchParams.get('pwd')
+  const pwd = ctx.req.query.pwd
   const storedPassword = await getPassword(ctx)
   let note = ''
   if (!storedPassword || (storedPassword && storedPassword === pwd)) {
@@ -283,7 +285,7 @@ app.get('/:path', async (ctx, next) => {
         const unlockModal = getDom('#unlockModal')
         const unlockPasswordInput = getDom('#unlockPasswordInput')
         const unlockPasswordButton = getDom('#unlockButton')
-        const passworSettingButton = getDom('#passwordSettingButton')
+        const passwordSettingButton = getDom('#passwordSettingButton')
         const savePasswordButton = getDom('#savePasswordButton')
         const menuToggle = getDom('#menuToggle')
         const shareButton = getDom('#shareButton')
@@ -300,7 +302,7 @@ app.get('/:path', async (ctx, next) => {
           if (!unlockPasswordInput.value) {
             alert('password cannot be empty')
           }
-          const url = window.location.origin + window.location.pathname + '/validate?password=' + unlockPasswordInput.value
+          const url = window.location.origin + window.location.pathname + '/verify?pwd=' + unlockPasswordInput.value
           fetch(url, {
             method: 'GET',
             headers: {
@@ -320,7 +322,7 @@ app.get('/:path', async (ctx, next) => {
           })
         })
 
-        passworSettingButton.addEventListener('click', () => {
+        passwordSettingButton.addEventListener('click', () => {
           menuToggle.click()
           fromShare = false
           if (hasPassword) {
@@ -392,12 +394,12 @@ app.post('/:path', async (ctx, next) => {
   await ctx.env.KV.put(path, text, {
     expirationTtl: 86400 * 365,
   })
-  ctx.res.setCookie('last_path', path)
+  await ctx.res.setCookie('last_path', path)
   ctx.res.status = 200
 })
 
 app.use(async (ctx, next) => {
-  const last_path = ctx.req.getCookie('last_path')
+  const last_path = await ctx.req.getCookie('last_path')
   if (isValidPath(last_path)) {
     ctx.res.redirect(last_path)
     return
