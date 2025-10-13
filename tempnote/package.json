@@ -24,7 +24,8 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@hoajs/cookie": "0.1.0",
     "@hoajs/router": "0.1.0",
-    "hoa": "0.1.0"
+    "hoa": "0.2.0"
   }
 }
