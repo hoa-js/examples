@@ -114,11 +114,7 @@ app.post('/:path', async (ctx, next) => {
 
 app.use(async (ctx, next) => {
   const lastPath = await ctx.req.getCookie('last_path')
-  if (lastPath) {
-    ctx.res.redirect(lastPath)
-    return
-  }
-  ctx.res.redirect(randomPath())
+  ctx.res.redirect(lastPath || randomPath())
 })
 
 export default app
