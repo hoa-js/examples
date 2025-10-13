@@ -7,7 +7,9 @@
   "scripts": {
     "lint": "eslint .",
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "dev:password": "wrangler dev -c wrangler.password.jsonc",
+    "deploy:password": "wrangler deploy -c wrangler.password.jsonc"
   },
   "author": "nswbmw",
   "license": "MIT",

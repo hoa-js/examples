@@ -11,7 +11,9 @@ A temporary note website built with [Hoa](https://github.com/hoa-js/hoa) framewo
 - 🎨 **Minimal Design** - Clean interface focused on content
 - 📝 **Lightweight** - Built with the Hoa framework for efficient, maintainable code
 
-Live Demo: [https://tempnote.hoa-js.com](https://tempnote.hoa-js.com)
+Live Demo:
+- [TempNote](https://tempnote.hoa-js.com)
+- [TempNote with password](https://tempnote_password.hoa-js.com)
 
 ⚠️ **Security Notice:** Do **not** input any sensitive information, such as API keys, account credentials, or secrets.
 
