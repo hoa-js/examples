@@ -30,6 +30,7 @@ app.get('/:path/verify', async (ctx, next) => {
 app.get('/:path', async (ctx, next) => {
   const path = ctx.req.params.path
   if (path === 'favicon.ico') {
+    ctx.res.status = 204
     return
   }
   const pwd = ctx.req.query.pwd
@@ -297,6 +298,7 @@ app.get('/:path', async (ctx, next) => {
     </body>
     </html>
   `
+  await ctx.res.setCookie('last_path', path)
 })
 
 app.post('/:path', async (ctx, next) => {
@@ -306,7 +308,6 @@ app.post('/:path', async (ctx, next) => {
     expirationTtl: 86400 * 365
   })
   ctx.res.status = 200
-  await ctx.res.setCookie('last_path', path)
 })
 
 app.use(async (ctx, next) => {

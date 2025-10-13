@@ -1,11 +1,17 @@
 import { Hoa } from 'hoa'
 import { router } from '@hoajs/router'
+import { cookie } from '@hoajs/cookie'
 
 const app = new Hoa()
 app.extend(router())
+app.extend(cookie())
 
 app.get('/:path', async (ctx, next) => {
   const path = ctx.req.params.path
+  if (path === 'favicon.ico') {
+    ctx.res.status = 204
+    return
+  }
   const note = await ctx.env.KV.get(path) || ''
   const safeNote = note.replace(/<\/textarea>/gi, '<\\/textarea>')
 
@@ -93,6 +99,7 @@ app.get('/:path', async (ctx, next) => {
     </body>
     </html>
   `
+  await ctx.res.setCookie('last_path', path)
 })
 
 app.post('/:path', async (ctx, next) => {
@@ -106,6 +113,11 @@ app.post('/:path', async (ctx, next) => {
 })
 
 app.use(async (ctx, next) => {
+  const lastPath = await ctx.req.getCookie('last_path')
+  if (lastPath) {
+    ctx.res.redirect(lastPath)
+    return
+  }
   ctx.res.redirect(randomPath())
 })
 

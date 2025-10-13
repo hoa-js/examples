@@ -16,16 +16,16 @@
     "url": "git+https://github.com/hoa-js/examples.git"
   },
   "devDependencies": {
-    "eslint": "9.36.0",
+    "eslint": "9.37.0",
     "neostandard": "0.12.2",
-    "wrangler": "~4.40.2"
+    "wrangler": "~4.42.2"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
     "@hoajs/cookie": "0.1.0",
-    "@hoajs/router": "0.1.0",
+    "@hoajs/router": "0.2.0",
     "hoa": "0.2.0"
   }
 }
