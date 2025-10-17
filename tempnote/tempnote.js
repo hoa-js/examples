@@ -12,14 +12,23 @@ app.get('/:path', async (ctx, next) => {
     ctx.res.status = 204
     return
   }
+
+  const returnText = ctx.req.query.text === '1'
   const note = await ctx.env.KV.get(path) || ''
-  const safeNote = note.replace(/<\/textarea>/gi, '<\\/textarea>')
 
   ctx.res.set({
     'Cache-Control': 'no-store, no-cache, must-revalidate',
     Pragma: 'no-cache',
     Expires: '0'
   })
+
+  if (returnText) {
+    ctx.res.type = 'text'
+    ctx.res.body = note
+    return
+  }
+
+  const safeNote = note.replace(/<\/textarea>/gi, '<\\/textarea>')
   ctx.res.body = `<!DOCTYPE html>
     <html>
     <head>
