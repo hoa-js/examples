@@ -2,13 +2,9 @@
   "account_id": "your-account-id", // Change to your Cloudflare Account ID
   "name": "2fa",
   "main": "index.js",
-  "compatibility_date": "2025-09-30",
+  "compatibility_date": "2025-10-30",
   "no_bundle": false,
   "minify": true,
-  "assets": {
-    "directory": "./public/",
-    "binding": "ASSETS"
-  },
   "routes": [
     {
       "pattern": "your-domain.com/*", // Change to your domain

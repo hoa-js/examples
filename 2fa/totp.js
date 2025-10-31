@@ -34,7 +34,7 @@ export default class TOTP {
 
   async generate (secretBase32, timestamp = Date.now()) {
     const counter = Math.floor(timestamp / 1000 / this.step)
-    return await this._generateFromCounter(secretBase32, counter)
+    return this._generateFromCounter(secretBase32, counter)
   }
 
   async verify (token, secretBase32, timestamp = Date.now()) {
@@ -67,10 +67,10 @@ export default class TOTP {
 
     const offset = h[h.length - 1] & 0xf
     const code =
-            ((h[offset] & 0x7f) << 24) |
-            ((h[offset + 1] & 0xff) << 16) |
-            ((h[offset + 2] & 0xff) << 8) |
-            (h[offset + 3] & 0xff)
+      ((h[offset] & 0x7f) << 24) |
+      ((h[offset + 1] & 0xff) << 16) |
+      ((h[offset + 2] & 0xff) << 8) |
+      (h[offset + 3] & 0xff)
 
     return (code % 10 ** this.digits).toString().padStart(this.digits, '0')
   }

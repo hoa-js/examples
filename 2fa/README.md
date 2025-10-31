@@ -22,7 +22,7 @@ A lightweight Two-Factor Authentication (2FA) web application built with Hoa.js.
 - Node.js >= 20
 - Cloudflare account
 
-### Install Dependenices
+### Install Dependencies
 
 ```bash
 pnpm install
@@ -46,10 +46,6 @@ mv wrangler.example.jsonc wrangler.jsonc
   "compatibility_date": "2025-10-30",
   "no_bundle": false,
   "minify": true,
-  "assets": {
-    "directory": "./public/",
-    "binding": "ASSETS"
-  },
   "routes": [
     {
       "pattern": "your-domain.com/*", // Change to your domain
