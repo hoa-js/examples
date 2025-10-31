@@ -1,7 +1,7 @@
 {
   "name": "2fa",
   "version": "1.0.0",
-  "description": "A 2fa website built with hoa.",
+  "description": "A 2fa website built with Hoa.",
   "main": "index.js",
   "private": true,
   "type": "module",
@@ -13,15 +13,15 @@
   "author": "RosApr",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "9.37.0",
+    "eslint": "9.38.0",
     "neostandard": "0.12.2",
-    "wrangler": "~4.42.2"
+    "wrangler": "~4.45.3"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
     "@hoajs/tiny-router": "0.1.0",
-    "hoa": "0.2.0"
+    "hoa": "0.3.0"
   }
 }

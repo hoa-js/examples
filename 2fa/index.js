@@ -9,13 +9,7 @@ app.get('/assets/*', async (ctx) => {
   ctx.res.body = await ctx.env.ASSETS.fetch(ctx.req)
 })
 
-app.get('/2fa/gen/:token', async (ctx) => {
-  const { token } = ctx.req.params
-  const code = await new TOTP().generate(token)
-  ctx.res.body = { code }
-})
-
-app.get('/2fa', async (ctx) => {
+app.get('/', async (ctx) => {
   ctx.res.body = `
         <!DOCTYPE html>
         <html lang="zh-CN">
@@ -100,6 +94,7 @@ app.get('/2fa', async (ctx) => {
                             rows="3"
                             placeholder="code"
                             class="input font-mono focus-visible:border-ring focus-visible:ring-ring/50"
+                            disabled
                         ></textarea>
                     </div>
                     <div class="flex justify-end">
@@ -107,7 +102,7 @@ app.get('/2fa', async (ctx) => {
                             class="btn"
                             @click="copy"
                         >
-                            Copy
+                            <span x-text="copyLabel"></span>
                         </button>
                     </div>
                 </div>
@@ -119,9 +114,13 @@ app.get('/2fa', async (ctx) => {
                     secret: '',
                     code: '',
                     loading: false,
+                    copyLabel: 'Copy',
                     copy() {
                         navigator.clipboard.writeText(this.code).then(() => {
-                            alert('code is already paste to clipboard')
+                            this.copyLabel = 'Copied!'
+                            setTimeout(() => {
+                                this.copyLabel = 'Copy'
+                            }, 3000)
                         })
                     },
                     genOTP() {
@@ -133,7 +132,7 @@ app.get('/2fa', async (ctx) => {
                             return false
                         }
                         this.loading = true
-                        const url = window.location.origin + window.location.pathname + '/gen/' + this.secret
+                        const url = window.location.origin + '/' + this.secret
                         fetch(url, {
                             headers: {
                                 'Content-Type': 'application/json'
@@ -154,8 +153,10 @@ app.get('/2fa', async (ctx) => {
     `
 })
 
-app.get('/', async (ctx) => {
-  ctx.res.redirect('/2fa')
+app.get('/:token', async (ctx) => {
+  const { token } = ctx.req.params
+  const code = await new TOTP().generate(token)
+  ctx.res.body = { code }
 })
 
 export default app

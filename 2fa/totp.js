@@ -13,7 +13,7 @@ export default class TOTP {
     if (!base32) return new Uint8Array(0)
     const tryDecode = (s) => {
       const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
-      const clean = s.replace(/[\s\-]+/g, '').replace(/=+$/, '').toUpperCase()
+      const clean = s.replace(/[\s-]+/g, '').replace(/=+$/, '').toUpperCase()
       let bits = ''
       for (const c of clean) {
         const val = alphabet.indexOf(c)

@@ -1,4 +1,4 @@
-# 2FA Lite
+## 2FA
 
 A lightweight Two-Factor Authentication (2FA) web application built with Hoa.js. This application provides TOTP (Time-based One-Time Password) generation and verification functionality.
 
@@ -17,18 +17,18 @@ A lightweight Two-Factor Authentication (2FA) web application built with Hoa.js.
 
 ## Getting Started
 
-## Prerequisites
+### Prerequisites
 
 - Node.js >= 20
 - Cloudflare account
 
-## Install Dependenices
+### Install Dependenices
 
 ```bash
 pnpm install
 ```
 
-## Configuration
+### Configuration
 
 1. Rename the configuration template:
 
@@ -41,9 +41,9 @@ mv wrangler.example.jsonc wrangler.jsonc
 ```json
 {
   "account_id": "your-account-id", // Change to your Cloudflare Account ID
-  "name": "tempnote",
-  "main": "tempnote.js",
-  "compatibility_date": "2025-09-30",
+  "name": "2fa",
+  "main": "index.js",
+  "compatibility_date": "2025-10-30",
   "no_bundle": false,
   "minify": true,
   "assets": {
@@ -65,13 +65,13 @@ You can configure the TOTP settings in the `totp.js` file:
 - `step`: Time step in seconds (default: 30)
 - `window`: Verification window (default: 1)
 
-## Local Development
+### Local Development
 
 ```bash
 pnpm run dev
 ```
 
-## Deploy
+### Deploy
 
 ```bash
 pnpm run deploy
