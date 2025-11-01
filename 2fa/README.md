@@ -9,6 +9,8 @@ A lightweight Two-Factor Authentication (2FA) web application built with Hoa.js.
 - Built with modern web standards
 - Easy to deploy with Cloudflare Workers
 
+Live Demo: [2fa.hoa-js.com](https://2fa.hoa-js.com)
+
 ## Tech Stack
 
 - [Hoa](https://github.com/hoa-js/hoa) - Lightweight web framework
