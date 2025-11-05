@@ -8,7 +8,7 @@ app.extend(cookie())
 
 app.get('/:path', async (ctx, next) => {
   const path = ctx.req.params.path
-  if (path === 'favicon.ico') {
+  if (!/^[0-9a-zA-Z]+$/.test(path)) {
     ctx.res.status = 204
     return
   }
