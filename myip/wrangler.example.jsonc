@@ -1,0 +1,18 @@
+{
+  "account_id": "your-account-id", // Change to your Cloudflare Account ID
+  "name": "myip",
+  "main": "myip.js",
+  "compatibility_date": "2025-11-18",
+  "no_bundle": false,
+  "minify": true,
+  "routes": [
+    {
+      "pattern": "your-domain.com/*", // Change to your domain
+      "zone_name": "your-domain.com" // Change to your domain
+    }
+  ],
+  "vars": {
+    "IPINFO_HOST": "https://ipinfo.io",
+    "IPINFO_TOKEN": "your-ipinfo-token"
+  }
+}
