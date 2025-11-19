@@ -1,0 +1,30 @@
+{
+  "name": "image-transformer",
+  "version": "1.0.0",
+  "description": "Image transformer built with Hoa.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "author": "nswbmw",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoa-js/examples.git"
+  },
+  "devDependencies": {
+    "eslint": "9.39.1",
+    "neostandard": "0.12.2",
+    "wrangler": "~4.49.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@hoajs/tiny-router": "0.1.0",
+    "hoa": "0.3.2"
+  }
+}
