@@ -27,7 +27,7 @@ Live Demo: [2fa.hoa-js.com](https://2fa.hoa-js.com)
 ### Install Dependencies
 
 ```bash
-pnpm install
+npm install
 ```
 
 ### Configuration
@@ -66,13 +66,13 @@ You can configure the TOTP settings in the `totp.js` file:
 ### Local Development
 
 ```bash
-pnpm run dev
+npm run dev
 ```
 
 ### Deploy
 
 ```bash
-pnpm run deploy
+npm run deploy
 ```
 
 ## License

@@ -5,7 +5,7 @@ const app = new Hoa()
 app.extend(tinyRouter())
 app.extend(cookie())
 
-app.post('/:path/password', async (ctx, next) => {
+app.post('/:path/password', async (ctx) => {
   const passwordKey = getPasswordKey(ctx)
   const { password } = await ctx.req.json()
   await ctx.env.KV.put(passwordKey, password, {
@@ -16,7 +16,7 @@ app.post('/:path/password', async (ctx, next) => {
   }
 })
 
-app.get('/:path/verify', async (ctx, next) => {
+app.get('/:path/verify', async (ctx) => {
   const storedPassword = await getPassword(ctx)
   const data = {
     status: ctx.req.query.pwd === storedPassword,
@@ -27,7 +27,7 @@ app.get('/:path/verify', async (ctx, next) => {
   ctx.res.body = data
 })
 
-app.get('/:path', async (ctx, next) => {
+app.get('/:path', async (ctx) => {
   const path = ctx.req.params.path
   if (!/^[0-9a-zA-Z]+$/.test(path)) {
     ctx.res.status = 204
@@ -301,7 +301,7 @@ app.get('/:path', async (ctx, next) => {
   await ctx.res.setCookie('last_path', path)
 })
 
-app.post('/:path', async (ctx, next) => {
+app.post('/:path', async (ctx) => {
   const path = ctx.req.params.path
   const text = ((await ctx.req.text()) || '').trim().slice(0, 65536)
   await ctx.env.KV.put(path, text, {
@@ -310,7 +310,7 @@ app.post('/:path', async (ctx, next) => {
   ctx.res.status = 200
 })
 
-app.use(async (ctx, next) => {
+app.use(async (ctx) => {
   const lastPath = await ctx.req.getCookie('last_path')
   ctx.res.redirect(lastPath || randomPath())
 })

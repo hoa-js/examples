@@ -4,12 +4,12 @@ import { tinyRouter } from '@hoajs/tiny-router'
 const app = new Hoa()
 app.extend(tinyRouter())
 
-app.get('/:ip', async (ctx, next) => {
+app.get('/:ip', async (ctx) => {
   const ip = ctx.req.params.ip
   ctx.res.body = await getIpinfoJson(ctx.env, ip)
 })
 
-app.use(async (ctx, next) => {
+app.use(async (ctx) => {
   const ip = ctx.req.ip
   ctx.res.body = await getIpinfoJson(ctx.env, ip)
 })
