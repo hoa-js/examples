@@ -1,0 +1,31 @@
+{
+  "name": "temptable",
+  "version": "1.0.0",
+  "description": "A temporary table website built with Hoa.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "eslint .",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "author": "nswbmw",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoa-js/examples.git"
+  },
+  "devDependencies": {
+    "eslint": "9.39.2",
+    "neostandard": "0.12.2",
+    "wrangler": "4.69.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@hoajs/cookie": "0.1.2",
+    "@hoajs/tiny-router": "0.1.1",
+    "hoa": "0.3.5"
+  }
+}
