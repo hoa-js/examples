@@ -8,7 +8,7 @@ app.extend(cookie())
 
 app.get('/:path', async (ctx) => {
   const path = ctx.req.params.path
-  if (!/^[0-9a-zA-Z]+$/.test(path)) {
+  if (!isValidPagePath(path)) {
     ctx.res.status = 204
     return
   }
@@ -124,7 +124,7 @@ app.post('/:path', async (ctx) => {
 
 app.use(async (ctx) => {
   const lastPath = await ctx.req.getCookie('last_path')
-  ctx.res.redirect(lastPath || randomPath())
+  ctx.res.redirect(isValidPagePath(lastPath) ? lastPath : randomPath())
 })
 
 export default app
@@ -136,6 +136,10 @@ function randomPath (len = 6) {
     result += chars.charAt(Math.floor(Math.random() * chars.length))
   }
   return result
+}
+
+function isValidPagePath (path) {
+  return /^[0-9a-zA-Z]+$/.test(path)
 }
 
 function convertToObjectArray (tableData) {

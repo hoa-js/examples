@@ -1,7 +1,7 @@
 {
   "account_id": "your-account-id", // Change to your Cloudflare Account ID
-  "name": "tamptable",
-  "main": "tamptable.js",
+  "name": "temptable",
+  "main": "temptable.js",
   "compatibility_date": "2026-02-27",
   "no_bundle": false,
   "minify": true,
