@@ -1,0 +1,26 @@
+{
+  "account_id": "your-account-id", // Change to your Cloudflare Account ID
+  "name": "tempfile",
+  "main": "tempfile.js",
+  "compatibility_date": "2026-03-05",
+  "no_bundle": false,
+  "minify": true,
+  "routes": [
+    {
+      "pattern": "your-domain.com/*", // Change to your domain
+      "zone_name": "your-domain.com" // Change to your domain
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "your-R2-namespace-id"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "your-kv-namespace-id" // Change to your KV Namespace ID
+    }
+  ]
+}
