@@ -4,6 +4,8 @@ import { cookie } from '@hoajs/cookie'
 import { mustache } from '@hoajs/mustache'
 import { getFileListHtmlString, getFileManagementHtmlString } from './tpl'
 
+const FILE_EXPIRATION_TTL = 86400 * 365
+
 const app = new Hoa()
 app.extend(tinyRouter())
 app.extend(cookie())
@@ -17,7 +19,7 @@ const fileManagment = {
   async upload (ctx, files) {
     await Promise.all(files.map(file => ctx.env.R2.put(generateUniqueKey(ctx, file.name), file)))
   },
-  async find (ctx, fileInfo) {
+  async get (ctx, fileInfo) {
     return await ctx.env.R2.get(generateUniqueKey(ctx, fileInfo.name))
   },
   async delete (ctx, fileInfo) {
@@ -28,8 +30,8 @@ const fileManagment = {
 const fileInfoManagment = {
   async getList (ctx) {
     const path = ctx.req.params.path
-    const list = await ctx.env.KV.get(path) || '[]'
-    return JSON.parse(list)
+    const list = await ctx.env.KV.get(path, 'json') || []
+    return list
   },
   async delete (ctx, fileInfo) {
     const list = await fileInfoManagment.getList(ctx)
@@ -39,7 +41,7 @@ const fileInfoManagment = {
     if (canDelete) {
       list.splice(index, 1)
       await ctx.env.KV.put(path, JSON.stringify(list), {
-        expirationTtl: 86400 * 365,
+        expirationTtl: FILE_EXPIRATION_TTL,
       })
     }
     return canDelete
@@ -56,7 +58,7 @@ const fileInfoManagment = {
     })
     const path = ctx.req.params.path
     await ctx.env.KV.put(path, JSON.stringify(list), {
-      expirationTtl: 86400 * 365,
+      expirationTtl: FILE_EXPIRATION_TTL,
     })
     return list
   },
@@ -479,9 +481,17 @@ app.get('/:path/files', async (ctx) => {
 
 app.get('/:path/:filename', async (ctx) => {
   const { filename } = ctx.req.params
-  const file = await fileManagment.find(ctx, { name: filename })
+  const file = await fileManagment.get(ctx, { name: filename })
+  if (!file) {
+    ctx.res.status = 404
+    ctx.res.body = 'File not found'
+    return
+  }
   ctx.res.body = await file.arrayBuffer()
-  ctx.res.type = filename.slice(filename.lastIndexOf('.') + 1)
+  ctx.res.set({
+    'Content-Type': 'application/octet-stream',
+    'Content-Disposition': `attachment; filename="${filename}"`
+  })
 })
 
 app.post('/:path', async (ctx) => {

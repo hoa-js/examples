@@ -160,6 +160,3 @@ settings.local.json
 
 # jest
 .jest-*
-
-# Custom
-wrangler.password.jsonc
