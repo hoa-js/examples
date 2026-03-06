@@ -7,8 +7,6 @@ A temporary file management website built with the [Hoa](https://github.com/hoa-
 - 📁 **Path-based File Spaces** - Manage files by URL path (e.g. `/team-a`, `/project-docs`)
 - 📤 **Batch Upload** - Upload multiple files in one request with progress feedback
 - 🗑️ **Delete Support** - Remove files directly from the list
-- 📥 **Direct Download** - Download files from the current path with one click
-- 👀 **Built-in Preview** - Preview images and Markdown files inline
 - ⚡ **Edge Powered** - Hosted on Cloudflare Workers for low-latency global access
 - 🧩 **Lightweight** - Built with Hoa for efficient, maintainable code
 
