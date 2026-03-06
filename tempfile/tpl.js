@@ -35,12 +35,6 @@ export function getFileIcon (fileName) {
   return FILE_ICON[ext] || '📄'
 }
 
-const CAN_PREVIEW_FILE_TYPES = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'md', 'markdown']
-
-export function showFilePreviewBtn (fileName) {
-  return CAN_PREVIEW_FILE_TYPES.includes(fileName.split('.').pop().toLowerCase())
-}
-
 export function formatFileDate (uploaded) {
   if (!uploaded) return ''
   const date = new Date(uploaded)
@@ -61,22 +55,26 @@ export const fileListTpl = `
         <div class="file-icon">{{icon}}</div>
         <div class="file-details">
           <div class="file-name">{{name}}</div>
-          <div class="file-meta">{{size}} • {{uploadedText}}</div>
+          <div class="file-meta">{{size}} · {{uploadedText}}</div>
         </div>
       </div>
       <div class="file-actions">
-        {{#canPreview}}
-          <span class="btn" data-type="preview" data-name="{{name}}">👀</span>
-        {{/canPreview}}
-        <span class="btn" data-type="download" data-name="{{name}}">📥</span>
-        <span class="btn" data-type="delete" data-name="{{name}}">🗑️</span>
+        <button class="action-btn action-btn--copy" data-type="copy" data-name="{{name}}" title="Copy link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </button>
+        <button class="action-btn action-btn--delete" data-type="delete" data-name="{{name}}" title="Delete">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+        </button>
       </div>
     </div>
  {{/fileList}}
  {{^fileList}}
     <div class="empty-state">
-      <div class="empty-icon">📂</div>
-      <div class="empty-text">No files yet. Upload your first file!</div>
+      <div class="empty-icon">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity=".35"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="empty-text">No files yet</div>
+      <div class="empty-sub">Upload your first file to get started</div>
     </div>
  {{/fileList}}
 `
@@ -84,12 +82,10 @@ export const fileListTpl = `
 export function getFileListHtmlString (ctx, fileList) {
   const viewFileList = (fileList || []).map(file => {
     const icon = getFileIcon(file.name)
-    const canPreview = showFilePreviewBtn(file.name)
     const uploadedText = formatFileDate(file.uploaded)
     return {
       ...file,
       icon,
-      canPreview,
       uploadedText
     }
   })
@@ -101,10 +97,15 @@ export function getFileListHtmlString (ctx, fileList) {
 
 export function getFileManagementHtmlString () {
   const fileManagementHtmlString = `
-    <div class="note-actions">
-      <button class="icon-btn" id="fileUpload">📤</button>
+    <div class="header-actions">
+      <button class="header-btn" id="refreshBtn" title="Refresh">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </button>
+      <button class="header-btn header-btn--primary" id="fileUpload" title="Upload">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span>Upload</span>
+      </button>
       <input type="file" id="fileInput" multiple class="hide" />
-      <button class="icon-btn" id="refreshBtn">🔄</button>
     </div>
   `
   const fileManagementScriptString = `
@@ -113,19 +114,11 @@ export function getFileManagementHtmlString () {
         const progressBar = document.getElementById('progressBar')
         const progressFill = document.getElementById('progressFill')
         const fileInput = document.getElementById('fileInput')
-        const previewContainer = document.getElementById('previewContainer')
         const fileListContainer = document.getElementById('fileListContainer')
         const refreshBtn = document.getElementById('refreshBtn')
         const uploadBtn = document.getElementById('fileUpload')
         refreshBtn.addEventListener('click', loadFiles)
-        let previewFileUrl = null
         let isLoading = false
-        previewContainer.addEventListener('click', function () {
-          previewContainer.replaceChildren()
-          previewContainer.classList.add('hide')
-          previewFileUrl && window.URL.revokeObjectURL(previewFileUrl)
-        })
-        const imageFileMap = new Map()
         uploadBtn.addEventListener('click', () => {
           fileInput.click()
         })
@@ -133,15 +126,15 @@ export function getFileManagementHtmlString () {
           handleFiles(e.target.files)
         })
         fileListContainer.addEventListener('click', (e) => {
-          switch (e.target.dataset.type) {
-            case 'download':
-              downloadFile(e.target.dataset.name)
-              break
+          const btn = e.target.closest('[data-type]')
+          if (!btn) return
+          const filename = btn.dataset.name
+          switch (btn.dataset.type) {
             case 'delete':
-              deleteFile(e.target.dataset.name)
+              deleteFile(filename)
               break
-            case 'preview':
-              previewFile(e.target.dataset.name)
+            case 'copy':
+              copyFileLink(filename)
               break
           }
         })
@@ -180,11 +173,11 @@ export function getFileManagementHtmlString () {
                   if (ok) {
                     showToast('success', 'Uploaded successfully!')
                   } else {
-                    showToast('error', 'Failed to upload ')
+                    showToast('error', 'Failed to upload')
                   }
                   resolve()
                 } else {
-                  showToast('error', 'Failed to upload ')
+                  showToast('error', 'Failed to upload')
                   reject(new Error('Upload failed with status ' + xhr.status))
                 }
               }
@@ -222,104 +215,14 @@ export function getFileManagementHtmlString () {
           fileListContainer.innerHTML = files
         }
 
-        async function previewFile(name) {
-          if (isLoading) {
-            return showToast('info', 'File is loading')
-          }
-          isLoading = true
-          try {
-            const ext = (name.split('.').pop() || '').toLowerCase()
-            const isMarkdown = ext === 'md' || ext === 'markdown'
-
-            const response = await fetch(window.location.origin + window.location.pathname + '/' + name)
-            if (!response.ok) {
-              showToast('error', 'Failed to load file')
-              return
-            }
-
-            previewContainer.replaceChildren()
-            previewFileUrl && window.URL.revokeObjectURL(previewFileUrl)
-            previewFileUrl = null
-
-            if (isMarkdown) {
-              const mdText = await response.text()
-              const unsafeHtml = window.marked ? window.marked.parse(mdText) : mdText
-              const safeHtml = window.DOMPurify ? window.DOMPurify.sanitize(unsafeHtml) : unsafeHtml
-              const wrapper = document.createElement('div')
-              wrapper.className = 'markdown-preview'
-              const body = document.createElement('div')
-              body.className = 'markdown-preview-body'
-              body.innerHTML = safeHtml
-              wrapper.append(body)
-              previewContainer.append(wrapper)
-              previewContainer.classList.remove('hide')
-              return
-            }
-
-            let fileBlob = imageFileMap.get(name)
-            if (!fileBlob) {
-              const blob = await response.blob()
-              imageFileMap.set(name, fileBlob = blob)
-            }
-            previewFileUrl = window.URL.createObjectURL(fileBlob)
-            const img = document.createElement('img')
-            img.src = previewFileUrl
-            previewContainer.append(img)
-            previewContainer.classList.remove('hide')
-          } finally {
-            isLoading = false
-          }
+        function copyFileLink(name) {
+          const link = window.location.origin + window.location.pathname + '/' + encodeURIComponent(name)
+          navigator.clipboard.writeText(link).then(() => {
+            showToast('success', 'Download link copied!')
+          }).catch(() => {
+            showToast('error', 'Failed to copy link')
+          })
         }
-
-        async function downloadFile(name) {
-          if (isLoading) {
-            return showToast('info', 'File is loading')
-          }
-          isLoading = true
-          try {
-            let fileBlob = imageFileMap.get(name)
-            if (!fileBlob) {
-              progressBar.style.display = 'block'
-              progressFill.style.width = '0%'
-              const response = await fetch(window.location.origin + window.location.pathname + '/' + name)
-              if (!response.ok) {
-                progressBar.style.display = 'none'
-                return showToast('error', 'Failed to download file')
-              }
-              const contentLength = +response.headers.get('Content-Length')
-              const reader = response.body.getReader()
-              let receivedLength = 0
-              let chunks = []
-              while (true) {
-                const { done, value } = await reader.read()
-                if (done) break
-                chunks.push(value)
-                receivedLength += value.length
-                if (contentLength) {
-                  progressFill.style.width = \`\${(receivedLength / contentLength) * 100}%\`
-                }
-              }
-              fileBlob = new Blob(chunks)
-              imageFileMap.set(name, fileBlob)
-              progressBar.style.display = 'none'
-            }
-            const url = window.URL.createObjectURL(fileBlob)
-            const a = document.createElement('a')
-            a.href = url
-            a.download = name
-            document.body.appendChild(a)
-            a.click()
-            window.URL.revokeObjectURL(url)
-            document.body.removeChild(a)
-            showToast('success', \`\${name} downloaded!\`)
-          } catch (error) {
-            progressBar.style.display = 'none'
-            showToast('error', 'Error downloading file')
-          } finally {
-            isLoading = false
-          }
-        }
-
         async function deleteFile(name) {
           if (!confirm(\`Are you sure you want to delete "\${name}"?\`)) {
             return
@@ -329,7 +232,6 @@ export function getFileManagementHtmlString () {
               method: 'DELETE'
             })
             if (response.ok) {
-              imageFileMap.delete(name)
               showToast('success', \`\${name} deleted!\`)
               loadFiles()
             } else {
