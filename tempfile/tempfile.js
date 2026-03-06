@@ -98,8 +98,6 @@ app.get('/:path', async (ctx) => {
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <title>Temp File</title>
-      <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
-      <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js" defer></script>
       <style>
         * {
           margin: 0;
@@ -112,85 +110,122 @@ app.get('/:path', async (ctx) => {
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
+          background: #f1f5f9;
+          color: #0f172a;
         }
+
+        .hide { display: none !important; }
+
         .container {
-          max-width: 1200px;
+          max-width: 760px;
           margin: 0 auto;
-          padding: 40px 20px;
+          padding: 48px 20px;
           height: 100%;
         }
 
-        #fileInput {
-          display: none;
-        }
+        #fileInput { display: none; }
+
         .module-container {
-          background: white;
-          border-radius: 16px;
-          padding: 30px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+          background: #fff;
+          border-radius: 20px;
+          padding: 28px 32px;
+          box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.06);
           height: 100%;
           display: flex;
-          flex-flow: column wrap;
+          flex-direction: column;
+          border: 1px solid #e2e8f0;
         }
+
         .file-list-header {
           display: flex;
           flex: none;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 20px;
-          padding-bottom: 15px;
-          border-bottom: 2px solid #f0f0f0;
+          margin-bottom: 24px;
+          padding-bottom: 20px;
+          border-bottom: 1px solid #e2e8f0;
         }
+
         .file-list-title {
-          font-size: 24px;
+          font-size: 22px;
           font-weight: 700;
-          color: #333;
+          letter-spacing: -.025em;
+          color: #0f172a;
         }
+
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .header-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          height: 38px;
+          padding: 0 14px;
+          border: 1px solid #e2e8f0;
+          border-radius: 10px;
+          background: #fff;
+          color: #475569;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: all .15s ease;
+        }
+
+        .header-btn:hover {
+          background: #f8fafc;
+          border-color: #cbd5e1;
+          color: #0f172a;
+        }
+
+        .header-btn--primary {
+          background: #6366f1;
+          border-color: #6366f1;
+          color: #fff;
+        }
+
+        .header-btn--primary:hover {
+          background: #4f46e5;
+          border-color: #4f46e5;
+          color: #fff;
+        }
+
         .file-list-container {
           overflow-y: auto;
           overflow-x: hidden;
           flex: 1;
-          -ms-overflow-style: none;
-          scrollbar-width: none;
+          scrollbar-width: thin;
+          scrollbar-color: #cbd5e1 transparent;
           scroll-behavior: smooth;
         }
-        .file-list-container::-webkit-scrollbar {
-          display: none;
-        }
-        .refresh-btn {
-          padding: 10px 20px;
-          background: #667eea;
-          color: white;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 600;
-          transition: all 0.3s ease;
-        }
 
-        .refresh-btn:hover {
-          background: #764ba2;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        .file-list-container::-webkit-scrollbar {
+          width: 4px;
+        }
+        .file-list-container::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 4px;
         }
 
         .file-item {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 20px;
-          margin-bottom: 12px;
-          background: #f8f9ff;
+          padding: 14px 16px;
+          margin-bottom: 6px;
+          background: #fff;
           border-radius: 12px;
-          transition: background-color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+          transition: all .15s ease;
           border: 1px solid transparent;
         }
 
         .file-item:hover {
-          background: #f0f2ff;
-          border-color: #667eea;
-          box-shadow: inset 3px 0 0 #667eea, 0 6px 14px rgba(102, 126, 234, 0.12);
+          background: #f8fafc;
+          border-color: #e2e8f0;
         }
 
         .file-info {
@@ -198,12 +233,19 @@ app.get('/:path', async (ctx) => {
           align-items: center;
           flex: 1;
           min-width: 0;
+          gap: 14px;
         }
 
         .file-icon {
-          font-size: 32px;
-          margin-right: 15px;
+          font-size: 28px;
           flex-shrink: 0;
+          width: 44px;
+          height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #f1f5f9;
+          border-radius: 10px;
         }
 
         .file-details {
@@ -212,82 +254,95 @@ app.get('/:path', async (ctx) => {
         }
 
         .file-name {
-          font-size: 16px;
+          font-size: 14px;
           font-weight: 600;
-          color: #333;
-          margin-bottom: 5px;
+          color: #0f172a;
+          margin-bottom: 2px;
           word-break: break-all;
+          line-height: 1.4;
         }
 
         .file-meta {
-          font-size: 13px;
-          color: #666;
+          font-size: 12px;
+          color: #94a3b8;
+          font-weight: 400;
         }
 
         .file-actions {
           display: flex;
-          gap: 10px;
+          gap: 4px;
           flex-shrink: 0;
+          margin-left: 12px;
         }
 
-        .btn {
-          padding: 8px 16px;
+        .action-btn {
+          width: 34px;
+          height: 34px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           border: none;
-          border-radius: 6px;
+          border-radius: 8px;
           cursor: pointer;
-          font-size: 14px;
-          font-weight: 600;
-          transition: all 0.3s ease;
+          background: transparent;
+          color: #94a3b8;
+          transition: all .15s ease;
         }
 
-        .btn-download {
-          background: #667eea;
-          color: white;
+        .action-btn:hover {
+          background: #f1f5f9;
+          color: #475569;
         }
 
-        .btn-download:hover {
-          background: #5568d3;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        .action-btn--copy:hover {
+          color: #6366f1;
+          background: #eef2ff;
         }
 
-        .btn-delete {
-          background: #ef4444;
-          color: white;
+        .action-btn--download:hover {
+          color: #059669;
+          background: #ecfdf5;
         }
 
-        .btn-delete:hover {
-          background: #dc2626;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        .action-btn--delete:hover {
+          color: #dc2626;
+          background: #fef2f2;
         }
 
+        /* ── Empty State ── */
         .empty-state {
           text-align: center;
           padding: 60px 20px;
-          color: #999;
+          color: #94a3b8;
           width: 100%;
           height: 100%;
           display: flex;
           justify-content: center;
           align-items: center;
-          flex-flow: column wrap;
+          flex-direction: column;
+          gap: 8px;
         }
 
         .empty-icon {
-          font-size: 64px;
-          margin-bottom: 20px;
-          opacity: 0.5;
+          margin-bottom: 8px;
+          color: #cbd5e1;
         }
 
         .empty-text {
-          font-size: 18px;
+          font-size: 16px;
+          font-weight: 600;
+          color: #64748b;
+        }
+
+        .empty-sub {
+          font-size: 13px;
+          color: #94a3b8;
         }
 
         .progress-bar {
           width: 100%;
-          height: 6px;
-          background: #e0e0e0;
+          height: 3px;
+          background: transparent;
           overflow: hidden;
           position: fixed;
           top: 0;
@@ -298,262 +353,78 @@ app.get('/:path', async (ctx) => {
 
         .progress-fill {
           height: 100%;
-          background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+          background: #6366f1;
           width: 0%;
           transition: width 0.3s ease;
+          border-radius: 0 2px 2px 0;
         }
 
         .toast {
           position: fixed;
           top: 20px;
           right: 20px;
-          padding: 16px 24px;
-          background: white;
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          padding: 14px 20px;
+          background: #fff;
+          border-radius: 12px;
+          box-shadow: 0 4px 24px rgba(0,0,0,.10);
           display: none;
           align-items: center;
-          gap: 12px;
+          gap: 10px;
           z-index: 1000;
-          animation: slideIn 0.3s ease;
+          animation: toastIn .25s cubic-bezier(.22,1,.36,1);
+          border: 1px solid #e2e8f0;
         }
 
-        @keyframes slideIn {
+        @keyframes toastIn {
           from {
-            transform: translateX(400px);
+            transform: translateY(-12px);
             opacity: 0;
           }
           to {
-            transform: translateX(0);
+            transform: translateY(0);
             opacity: 1;
           }
         }
 
-        .toast.success {
-          border-left: 4px solid #10b981;
-        }
+        .toast.success { border-left: 3px solid #10b981; }
+        .toast.error   { border-left: 3px solid #ef4444; }
+        .toast.info    { border-left: 3px solid #6366f1; }
 
-        .toast.error {
-          border-left: 4px solid #ef4444;
-        }
+        .toast-icon { font-size: 20px; }
 
-        .toast.info {
-          border-left: 4px solid blue;
-        }
-
-        .toast-icon {
-          font-size: 24px;
-        }
-
-        .mask,
-        .preview-container {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: rgba(0, 0, 0, .7);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .preview-container img {
-          max-width: 80%;
-          max-height: 80%;
-          object-fit: contain;
-        }
-        .preview-container .markdown-preview {
-          width: min(920px, 100%);
-          max-height: calc(100vh - 48px);
-          background: #ffffff;
-          color: #111827;
-          border-radius: 16px;
-          padding: 20px 20px;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
-          overflow: hidden;
-          line-height: 1.75;
-          font-size: 15px;
-        }
-        .preview-container .markdown-preview-body {
-          max-height: calc(100vh - 48px - 40px);
-          overflow: auto;
-          -webkit-overflow-scrolling: touch;
-        }
-        .preview-container .markdown-preview > :first-child {
-          margin-top: 0;
-        }
-        .preview-container .markdown-preview > :last-child {
-          margin-bottom: 0;
-        }
-        .preview-container .markdown-preview h1,
-        .preview-container .markdown-preview h2,
-        .preview-container .markdown-preview h3,
-        .preview-container .markdown-preview h4,
-        .preview-container .markdown-preview h5,
-        .preview-container .markdown-preview h6 {
-          margin: 18px 0 10px;
-          line-height: 1.25;
-          font-weight: 700;
-        }
-        .preview-container .markdown-preview h1 { font-size: 24px; }
-        .preview-container .markdown-preview h2 { font-size: 20px; }
-        .preview-container .markdown-preview h3 { font-size: 17px; }
-        .preview-container .markdown-preview p {
-          margin: 10px 0;
-        }
-        .preview-container .markdown-preview a {
-          color: #2563eb;
-          text-decoration: underline;
-          word-break: break-word;
-        }
-        .preview-container .markdown-preview ul,
-        .preview-container .markdown-preview ol {
-          margin: 10px 0 10px 20px;
-          padding: 0;
-        }
-        .preview-container .markdown-preview li {
-          margin: 4px 0;
-        }
-        .preview-container .markdown-preview blockquote {
-          margin: 12px 0;
-          padding: 10px 12px;
-          border-left: 4px solid #e5e7eb;
-          background: #f9fafb;
-          border-radius: 10px;
-          color: #374151;
-        }
-        .preview-container .markdown-preview code {
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-          font-size: .95em;
-          background: #f3f4f6;
-          padding: 2px 6px;
-          border-radius: 8px;
-        }
-        .preview-container .markdown-preview pre {
-          margin: 12px 0;
-          padding: 12px 14px;
-          overflow: auto;
-          background: #0b1020;
-          color: #e5e7eb;
-          border-radius: 12px;
-        }
-        .preview-container .markdown-preview pre code {
-          background: transparent;
-          padding: 0;
-          border-radius: 0;
-          color: inherit;
-        }
-        .preview-container .markdown-preview hr {
-          border: none;
-          border-top: 1px solid #e5e7eb;
-          margin: 16px 0;
-        }
-        .preview-container .markdown-preview table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 12px 0;
-          overflow: hidden;
-          border-radius: 12px;
-        }
-        .preview-container .markdown-preview th,
-        .preview-container .markdown-preview td {
-          border: 1px solid #e5e7eb;
-          padding: 8px 10px;
-          text-align: left;
-          vertical-align: top;
-        }
-        .preview-container .markdown-preview th {
-          background: #f9fafb;
-          font-weight: 700;
-        }
-        .preview-container .markdown-preview img {
-          max-width: 100%;
-          height: auto;
-          border-radius: 12px;
-        }
-        @media (max-width: 480px) {
-          .preview-container { padding: 12px; }
-          .preview-container .markdown-preview {
-            max-height: calc(100vh - 24px);
-            padding: 14px 14px;
-            border-radius: 14px;
-          }
-          .preview-container .markdown-preview-body {
-            max-height: calc(100vh - 24px - 28px);
-          }
-        }
-        .hide {
-          display:none!important;
-        }
         .toast-message {
-          font-size: 14px;
-          font-weight: 600;
-          color: #333;
-        }
-        .operate-button {
-          display: flex;
-          gap: 10px;
-          justify-content: center;
-          margin-top: 14px;
+          font-size: 13px;
+          font-weight: 500;
+          color: #334155;
         }
 
-        .operate-button button {
-          height: 40px;
-          padding: 0 14px;
-          border-radius: 10px;
-          cursor: pointer;
-          font-weight: 700;
-          transition: all 0.2s ease;
-        }
-
-        .operate-button button:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 8px 18px rgba(0,0,0,0.12);
-        }
-        .note-actions {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        .note-actions .icon-btn {
-          width: 40px;
-          height: 40px;
-          border-radius: 999px;
-          border: 1px solid rgba(0,0,0,0.10);
-          background: rgba(255, 255, 255, 0.8);
-          -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 18px;
-          line-height: 1;
-          transition: all 0.2s ease;
-        }
-        .note-actions .icon-btn:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 10px 22px rgba(0,0,0,0.15);
-        }
-        @media (max-width: 768px) {
-          .note-actions .icon-btn {
-            width: 36px;
-            height: 36px;
-            font-size: 17px;
+        @media (max-width: 640px) {
+          .container {
+            padding: 16px 12px;
           }
-        }
-        @media (max-width: 768px) {
-          .file-list {
-            padding: 20px;
+          .module-container {
+            padding: 20px 16px;
+            border-radius: 16px;
+          }
+          .file-list-title {
+            font-size: 18px;
           }
           .file-item {
             flex-direction: column;
             align-items: flex-start;
-            gap: 15px;
+            gap: 12px;
+            padding: 14px;
           }
           .file-actions {
             width: 100%;
             justify-content: flex-end;
+            margin-left: 0;
+          }
+          .header-btn span {
+            display: none;
+          }
+          .header-btn--primary {
+            padding: 0 12px;
           }
         }
     </style>
@@ -577,12 +448,9 @@ app.get('/:path', async (ctx) => {
         <div class="toast-icon" id="toastIcon"></div>
         <div class="toast-message" id="toastMessage"></div>
       </div>
-      <div class='preview-container hide' id='previewContainer'></div>
-      <div class="mask hide" id='mask'></div>
       <script>
         const toast = document.getElementById('toast')
         const toastIcon = document.getElementById('toastIcon')
-        const mask = document.getElementById('mask')
         const toastMessage = document.getElementById('toastMessage')
         function showToast(type, message) {
           const icon = {success: '✅', error: '❌', info: '📢'}
