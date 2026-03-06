@@ -74,7 +74,7 @@ export const fileListTpl = `
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity=".35"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
       </div>
       <div class="empty-text">No files yet</div>
-      <div class="empty-sub">Upload your first file to get started</div>
+      <div class="empty-sub">Files will be automatically deleted after 7 days</div>
     </div>
  {{/fileList}}
 `
