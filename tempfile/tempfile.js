@@ -527,5 +527,5 @@ function randomPath (len = 6) {
 }
 
 function isValidPagePath (path) {
-  return /^[0-9a-zA-Z]+$/.test(path)
+  return path && /^[0-9a-zA-Z]+$/.test(path)
 }
