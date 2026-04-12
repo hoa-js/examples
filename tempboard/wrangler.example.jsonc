@@ -1,0 +1,11 @@
+{
+  "name": "", // Change to your Cloudflare Pages name
+  "compatibility_date": "2026-04-12",
+  "pages_build_output_dir": "dist",
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "your-kv-namespace-id"  // Change to your KV Namespace ID
+    }
+  ]
+}

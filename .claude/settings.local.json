@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(printf '\\\\n---README---\\\\n')",
+      "Bash(printf '\\\\n---PACKAGE---\\\\n')",
+      "Bash(printf '\\\\n---PARENT PACKAGE CHECK---\\\\n')",
+      "Bash([ -f ../package.json ])",
+      "Bash(printf 'No ../package.json\\\\n')",
+      "Bash(printf '\\\\n---PARENT SRC CHECK---\\\\n')",
+      "Bash([ -d ../src ])",
+      "Bash(printf '\\\\n---TEMPBOARD README---\\\\n')",
+      "Bash(node:*)",
+      "Bash(yarn:*)",
+      "WebFetch(domain:unpkg.com)",
+      "WebSearch",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm install:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp -r /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/components/editor /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/components/controls /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/components/panel /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/components/slider /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/components/select /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/components/checkbox /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/components/colors src/components/)",
+      "Bash(cp -r /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/hooks src/)",
+      "Bash(cp /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/state/state.ts /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/state/easings.ts /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/state/utils.ts /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/state/index.ts src/state/)",
+      "Bash(cp /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/state/shapes/draw.tsx /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/state/shapes/index.ts src/state/shapes/)",
+      "Bash(cp /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/types.ts /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/styles.css /c/Users/admin/work/hoa/perfect-freehand/packages/dev/src/index.html src/)",
+      "Bash(npx vite:*)",
+      "Bash(python:*)"
+    ]
+  }
+}
